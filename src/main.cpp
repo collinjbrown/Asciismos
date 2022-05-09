@@ -123,6 +123,14 @@ int main(void)
     // Each pixel in the source sprite has an r and a b value that denotes some x and y value on the map
     // which is used to find the color of the pixel.
 
+    Texture2D blank{ "assets/sprites/blank.png", true, GL_NEAREST };
+    renderer.textureIDs.push_back(blank.ID);
+    Game::main.textureMap.emplace("blank", &blank);
+
+    Texture2D blankMap{ "assets/sprites/blank_map.png", true, GL_NEAREST };
+    renderer.textureIDs.push_back(blankMap.ID);
+    Game::main.textureMap.emplace("base_map", &blankMap);
+
     Texture2D watermark{ "assets/sprites/watermark/watermark.png", true, GL_NEAREST };
     renderer.textureIDs.push_back(watermark.ID);
     Game::main.textureMap.emplace("watermark", &watermark);

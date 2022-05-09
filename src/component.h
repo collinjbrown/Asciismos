@@ -16,7 +16,7 @@ class Entity;
 
 // There is surely a more elegant way to handle IDs; we could dynamically assign them at runtime,
 // but honestly, this works so I'm not particularly compelled to change it.
-static int positionComponentID = 1;
+static int globalPositionComponentID = 1;
 static int spriteComponentID = 2;
 static int inputComponentID = 3;
 static int animationComponentID = 4;
@@ -25,6 +25,8 @@ static int cameraFollowComponentID = 6;
 static int particleComponentID = 7;
 static int aiComponentID = 8;
 static int imageComponentID = 9;
+static int buttonComponentID = 10;
+static int worldComponentID = 11;
 
 static int exampleAnimControllerSubID = 1;
 
@@ -37,7 +39,7 @@ public:
 	int ID;
 };
 
-class PositionComponent : public Component
+class GlobalPositionComponent : public Component
 {
 	// The position component lacked, for quite some time, its own system,
 	// but I've recently carved the position-modifying portion of the physics system out
@@ -70,7 +72,7 @@ public:
 	glm::vec2 RelativeLocation(glm::vec2 p, glm::vec2 up, glm::vec2 right);
 
 	// And the constructor.
-	PositionComponent(Entity* entity, bool active, bool stat, float x, float y, float z, float rotation);
+	GlobalPositionComponent(Entity* entity, bool active, bool stat, float x, float y, float z, float rotation);
 };
 
 class PhysicsComponent : public Component
@@ -102,9 +104,9 @@ public:
 
 	// In certain components, we keep a reference to the position component since one needs to exist
 	// for the system to work properly. I really should either remove this or standardize it.
-	PositionComponent* pos;
+	GlobalPositionComponent* pos;
 
-	PhysicsComponent(Entity* entity, bool active, PositionComponent* pos, float vX, float vY, float vZ, float vR, float drag, float gravityMod);
+	PhysicsComponent(Entity* entity, bool active, GlobalPositionComponent* pos, float vX, float vY, float vZ, float vR, float drag, float gravityMod);
 };
 
 class StaticSpriteComponent : public Component
@@ -135,9 +137,9 @@ public:
 	Texture2D* mapTex;
 
 	// Again, a quick and dirty reference to the position component allows us to reference it directly instead of going through the entity's component map.
-	PositionComponent* pos;
+	GlobalPositionComponent* pos;
 
-	StaticSpriteComponent(Entity* entity, bool active, PositionComponent* pos, float width, float height, float scaleX, float scaleY, Texture2D* sprite, Texture2D* mapTex, bool flippedX, bool flippedY, bool tiled);
+	StaticSpriteComponent(Entity* entity, bool active, GlobalPositionComponent* pos, float width, float height, float scaleX, float scaleY, Texture2D* sprite, Texture2D* mapTex, bool flippedX, bool flippedY, bool tiled);
 };
 
 class InputComponent : public Component
@@ -166,7 +168,7 @@ public:
 	map<std::string, Animation2D*> animations;
 	Texture2D* mapTex;
 
-	PositionComponent* pos;
+	GlobalPositionComponent* pos;
 
 	float lastTick;
 
@@ -180,7 +182,7 @@ public:
 
 	void AddAnimation(std::string s, Animation2D* anim);
 
-	AnimationComponent(Entity* entity, bool active, PositionComponent* pos, Animation2D* idleAnimation, std::string animationName, Texture2D* mapTex, float scaleX, float scaleY, bool flippedX, bool flippedY);
+	AnimationComponent(Entity* entity, bool active, GlobalPositionComponent* pos, Animation2D* idleAnimation, std::string animationName, Texture2D* mapTex, float scaleX, float scaleY, bool flippedX, bool flippedY);
 };
 
 class AnimationControllerComponent : public Component

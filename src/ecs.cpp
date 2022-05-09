@@ -130,10 +130,9 @@ void ECS::Update(float deltaTime)
 		Texture2D* watermark = Game::main.textureMap["watermark"];
 		Texture2D* watermarkMap = Game::main.textureMap["watermarkMap"];
 
-		ECS::main.RegisterComponent(new PositionComponent(alphaWatermark, true, true, 0, 0, 100, 0), alphaWatermark);
-		ECS::main.RegisterComponent(new StaticSpriteComponent(alphaWatermark, true, (PositionComponent*)alphaWatermark->componentIDMap[positionComponentID], watermark->width, watermark->height, 1.0f, 1.0f, watermark, watermarkMap, false, false, false), alphaWatermark);
+		ECS::main.RegisterComponent(new GlobalPositionComponent(alphaWatermark, true, true, 0, 0, 100, 0), alphaWatermark);
+		ECS::main.RegisterComponent(new StaticSpriteComponent(alphaWatermark, true, (GlobalPositionComponent*)alphaWatermark->componentIDMap[globalPositionComponentID], watermark->width, watermark->height, 1.0f, 1.0f, watermark, watermarkMap, false, false, false), alphaWatermark);
 		ECS::main.RegisterComponent(new ImageComponent(alphaWatermark, true, Anchor::topRight, 0, 0), alphaWatermark);
-
 
 		#pragma endregion
 	}
@@ -158,7 +157,7 @@ void ECS::Update(float deltaTime)
 //
 //			for (int e = 0; e < entities.size(); e++)
 //			{
-//				PositionComponent* pos = (PositionComponent*)entities[e]->componentIDMap[positionComponentID];
+//				GlobalPositionComponent* pos = (GlobalPositionComponent*)entities[e]->componentIDMap[globalPositionComponentID];
 //				ColliderComponent* col = (ColliderComponent*)entities[e]->componentIDMap[colliderComponentID];
 //
 //				blocked = (PointOverlapRect(glm::vec2(x * nodeSize, y * nodeSize), glm::vec2(pos->x, pos->y) + glm::vec2(col->offsetX, col->offsetY), col->width, col->height) && !col->trigger && pos->stat);
@@ -232,7 +231,7 @@ void ECS::RegisterComponent(Component* component, Entity* entity)
 #pragma region Components
 
 #pragma region Position Component
-glm::vec2 PositionComponent::Rotate(glm::vec2 point)
+glm::vec2 GlobalPositionComponent::Rotate(glm::vec2 point)
 {
 	glm::vec3 forward = glm::vec3();
 	glm::vec3 up = glm::vec3();
@@ -255,14 +254,14 @@ glm::vec2 PositionComponent::Rotate(glm::vec2 point)
 	return RelativeLocation(point, up, right);
 }
 
-glm::vec2 PositionComponent::RelativeLocation(glm::vec2 p, glm::vec2 up, glm::vec2 right)
+glm::vec2 GlobalPositionComponent::RelativeLocation(glm::vec2 p, glm::vec2 up, glm::vec2 right)
 {
 	return glm::vec2((p.x * right.x) + (p.y * up.x), (p.x * right.y) + (p.y * up.y));
 }
 
-PositionComponent::PositionComponent(Entity* entity, bool active, bool stat, float x, float y, float z, float rotation)
+GlobalPositionComponent::GlobalPositionComponent(Entity* entity, bool active, bool stat, float x, float y, float z, float rotation)
 {
-	ID = positionComponentID;
+	ID = globalPositionComponentID;
 	this->active = active;
 	this->entity = entity;
 	this->stat = stat;
@@ -275,7 +274,7 @@ PositionComponent::PositionComponent(Entity* entity, bool active, bool stat, flo
 
 #pragma region Static Sprite Component
 
-StaticSpriteComponent::StaticSpriteComponent(Entity* entity, bool active, PositionComponent* pos, float width, float height, float scaleX, float scaleY, Texture2D* sprite, Texture2D* mapTex, bool flippedX, bool flippedY, bool tiled)
+StaticSpriteComponent::StaticSpriteComponent(Entity* entity, bool active, GlobalPositionComponent* pos, float width, float height, float scaleX, float scaleY, Texture2D* sprite, Texture2D* mapTex, bool flippedX, bool flippedY, bool tiled)
 {
 	ID = spriteComponentID;
 	this->active = active;
@@ -343,7 +342,7 @@ void AnimationComponent::AddAnimation(std::string s, Animation2D* anim)
 	animations.emplace(s, anim);
 }
 
-AnimationComponent::AnimationComponent(Entity* entity, bool active, PositionComponent* pos, Animation2D* idleAnimation, std::string animationName, Texture2D* mapTex, float scaleX, float scaleY, bool flippedX, bool flippedY)
+AnimationComponent::AnimationComponent(Entity* entity, bool active, GlobalPositionComponent* pos, Animation2D* idleAnimation, std::string animationName, Texture2D* mapTex, float scaleX, float scaleY, bool flippedX, bool flippedY)
 {
 	this->ID = animationComponentID;
 	this->entity = entity;
@@ -443,7 +442,7 @@ void StaticRenderingSystem::Update(int activeScene, float deltaTime)
 		if (s->active && s->entity->Get_Scene() == activeScene ||
 			s->active && s->entity->Get_Scene() == 0)
 		{
-			PositionComponent* pos = s->pos;
+			GlobalPositionComponent* pos = s->pos;
 
 			if (pos->x + (s->width / 2.0f) > Game::main.leftX && pos->x - (s->width / 2.0f) < Game::main.rightX &&
 				pos->y + (s->height / 2.0f) > Game::main.bottomY && pos->y - (s->height / 2.0f) < Game::main.topY &&
@@ -522,7 +521,7 @@ void CameraFollowSystem::Update(int activeScene, float deltaTime)
 		if (f->active && f->entity->Get_Scene() == activeScene ||
 			f->active && f->entity->Get_Scene() == 0)
 		{
-			PositionComponent* pos = (PositionComponent*)f->entity->componentIDMap[positionComponentID];
+			GlobalPositionComponent* pos = (GlobalPositionComponent*)f->entity->componentIDMap[globalPositionComponentID];
 
 			Game::main.camX = Lerp(Game::main.camX, pos->x, f->speed * deltaTime);
 			Game::main.camY = Lerp(Game::main.camY, pos->y, f->speed * deltaTime);
@@ -664,7 +663,7 @@ void AnimationSystem::Update(int activeScene, float deltaTime)
 				}
 			}
 
-			PositionComponent* pos = a->pos;
+			GlobalPositionComponent* pos = a->pos;
 
 			if (pos->x + ((activeAnimation->width / activeAnimation->columns) / 2.0f) > Game::main.leftX && pos->x - ((activeAnimation->width / activeAnimation->columns) / 2.0f) < Game::main.rightX &&
 				pos->y + ((activeAnimation->height / activeAnimation->rows) / 2.0f) > Game::main.bottomY && pos->y - ((activeAnimation->height / activeAnimation->rows) / 2.0f) < Game::main.topY &&
@@ -718,7 +717,7 @@ void ParticleSystem::Update(int activeScene, float deltaTime)
 			if (p->lastTick >= p->tickRate)
 			{
 				p->lastTick = 0.0f;
-				PositionComponent* pos = (PositionComponent*)p->entity->componentIDMap[positionComponentID];
+				GlobalPositionComponent* pos = (GlobalPositionComponent*)p->entity->componentIDMap[globalPositionComponentID];
 				glm::vec2 pPos = glm::vec2(pos->x + p->xOffset, pos->y + p->yOffset);
 
 				if (pPos.x > screenLeft && pPos.x < screenRight &&
@@ -768,7 +767,7 @@ void ImageSystem::Update(int activeScene, float deltaTime)
 		if (img->active && img->entity->Get_Scene() == activeScene ||
 			img->active && img->entity->Get_Scene() == 0)
 		{
-			PositionComponent* pos = (PositionComponent*)img->entity->componentIDMap[positionComponentID];
+			GlobalPositionComponent* pos = (GlobalPositionComponent*)img->entity->componentIDMap[globalPositionComponentID];
 			StaticSpriteComponent* sprite = (StaticSpriteComponent*)img->entity->componentIDMap[spriteComponentID];
 
 			glm::vec2 anchorPos;

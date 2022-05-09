@@ -261,7 +261,7 @@ void Renderer::prepareQuad(glm::vec2 position, float width, float height, float 
     quad.topLeft = { leftX,  topY,      r, g, b, a,   0.0, 1.0,    bundle.textureLocation, bundle.mapLocation, CalculateModifier(width), CalculateModifier(height) };
 }
 
-void Renderer::prepareQuad(PositionComponent* pos, float width, float height, float scaleX, float scaleY,
+void Renderer::prepareQuad(GlobalPositionComponent* pos, float width, float height, float scaleX, float scaleY,
     glm::vec4 rgb, int textureID, int mapID, bool tiled, bool flippedX, bool flippedY)
 {
     // Figure out which batch should be written to
@@ -325,7 +325,7 @@ void Renderer::prepareQuad(PositionComponent* pos, float width, float height, fl
 }
 
 
-void Renderer::prepareQuad(PositionComponent* pos, float width, float height, float scaleX, float scaleY,
+void Renderer::prepareQuad(GlobalPositionComponent* pos, float width, float height, float scaleX, float scaleY,
     glm::vec4 rgb, int animID, int mapID, int cellX, int cellY, int cols, int rows, bool flippedX, bool flippedY)
 {
     // Figure out which batch should be written to
@@ -388,7 +388,7 @@ void Renderer::prepareQuad(PositionComponent* pos, float width, float height, fl
 }
 
 
-void Renderer::prepareQuad(PositionComponent* pos, ColliderComponent* col, float width, float height, float scaleX, float scaleY,
+void Renderer::prepareQuad(GlobalPositionComponent* pos, ColliderComponent* col, float width, float height, float scaleX, float scaleY,
     glm::vec4 rgb, int textureID, int mapID)
 {
     // Figure out which batch should be written to

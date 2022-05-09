@@ -15,7 +15,7 @@
 using namespace std;
 
 class Component;
-class PositionComponent;
+class GlobalPositionComponent;
 class PhysicsComponent;
 class StaticSpriteComponent;
 class InputComponent;
