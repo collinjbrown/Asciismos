@@ -76,7 +76,7 @@ public:
 			{
 				Particle* particle = particles[p];
 				Texture2D* s = Game::main.textureMap["blank"];
-				glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+				glm::vec4 color;
 
 				int r = rand() % 100 + 1;
 				float cr = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
@@ -147,7 +147,7 @@ public:
 				{
 					particle->ticks += 1;
 					// Game::main.renderer->prepareQuad(glm::vec2(particle->x, particle->y), 1.0f, 1.0f, color, s->ID);
-					Game::main.renderer->prepareQuad(glm::vec2(particle->x, particle->y), s->width / 4.0f, s->height / 4.0f, 1.0f, 1.0f, color, s->ID, false, false);
+					Game::main.renderer->prepareQuad(glm::vec2(particle->x, particle->y), s->width / 4.0f, s->height / 4.0f, 1.0f, 1.0f, color, s->ID, Game::main.textureMap["base_map"]->ID);
 				}
 				else
 				{
@@ -184,7 +184,7 @@ public:
 					color = glm::vec4(0.5f, cr, 0.5f, 1.0f);
 				}
 
-				Game::main.renderer->prepareQuad(glm::vec2(particle->x, particle->y), s->width / 4.0f, s->height / 4.0f, 1.0f, 1.0f, color, s->ID, false, false);
+				Game::main.renderer->prepareQuad(glm::vec2(particle->x, particle->y), s->width / 4.0f, s->height / 4.0f, 1.0f, 1.0f, color, s->ID, Game::main.textureMap["base_map"]->ID);
 			}
 		}
 	}

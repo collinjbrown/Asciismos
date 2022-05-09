@@ -128,9 +128,10 @@ void ECS::Update(float deltaTime)
 
 		Entity* alphaWatermark = CreateEntity(0, "Watermark");
 		Texture2D* watermark = Game::main.textureMap["watermark"];
+		Texture2D* watermarkMap = Game::main.textureMap["watermarkMap"];
 
 		ECS::main.RegisterComponent(new PositionComponent(alphaWatermark, true, true, 0, 0, 100, 0), alphaWatermark);
-		ECS::main.RegisterComponent(new StaticSpriteComponent(alphaWatermark, true, (PositionComponent*)alphaWatermark->componentIDMap[positionComponentID], watermark->width, watermark->height, 1.0f, 1.0f, watermark, false, false, false), alphaWatermark);
+		ECS::main.RegisterComponent(new StaticSpriteComponent(alphaWatermark, true, (PositionComponent*)alphaWatermark->componentIDMap[positionComponentID], watermark->width, watermark->height, 1.0f, 1.0f, watermark, watermarkMap, false, false, false), alphaWatermark);
 		ECS::main.RegisterComponent(new ImageComponent(alphaWatermark, true, Anchor::topRight, 0, 0), alphaWatermark);
 
 
@@ -274,7 +275,7 @@ PositionComponent::PositionComponent(Entity* entity, bool active, bool stat, flo
 
 #pragma region Static Sprite Component
 
-StaticSpriteComponent::StaticSpriteComponent(Entity* entity, bool active, PositionComponent* pos, float width, float height, float scaleX, float scaleY, Texture2D* sprite, bool flippedX, bool flippedY, bool tiled)
+StaticSpriteComponent::StaticSpriteComponent(Entity* entity, bool active, PositionComponent* pos, float width, float height, float scaleX, float scaleY, Texture2D* sprite, Texture2D* mapTex, bool flippedX, bool flippedY, bool tiled)
 {
 	ID = spriteComponentID;
 	this->active = active;
@@ -288,6 +289,7 @@ StaticSpriteComponent::StaticSpriteComponent(Entity* entity, bool active, Positi
 	this->scaleY = scaleY;
 
 	this->sprite = sprite;
+	this->mapTex = mapTex;
 
 	this->flippedX = flippedX;
 	this->flippedY = flippedY;
@@ -341,15 +343,15 @@ void AnimationComponent::AddAnimation(std::string s, Animation2D* anim)
 	animations.emplace(s, anim);
 }
 
-AnimationComponent::AnimationComponent(Entity* entity, bool active, PositionComponent* pos, Animation2D* idleAnimation, std::string animationName, float scaleX, float scaleY, bool flippedX, bool flippedY)
+AnimationComponent::AnimationComponent(Entity* entity, bool active, PositionComponent* pos, Animation2D* idleAnimation, std::string animationName, Texture2D* mapTex, float scaleX, float scaleY, bool flippedX, bool flippedY)
 {
 	this->ID = animationComponentID;
 	this->entity = entity;
 	this->active = active;
 
-	lastTick = 0;
-	activeX = 0;
-	activeY = 0;
+	this->lastTick = 0;
+	this->activeX = 0;
+	this->activeY = 0;
 
 	this->pos = pos;
 
@@ -359,9 +361,11 @@ AnimationComponent::AnimationComponent(Entity* entity, bool active, PositionComp
 	this->flippedX = flippedX;
 	this->flippedY = flippedY;
 
-	activeAnimation = animationName;
-	animations.emplace(animationName, idleAnimation);
-	activeY = animations[activeAnimation]->rows - 1;
+	this->activeAnimation = animationName;
+	this->animations.emplace(animationName, idleAnimation);
+	this->activeY = animations[activeAnimation]->rows - 1;
+
+	this->mapTex = mapTex;
 }
 
 #pragma endregion
@@ -445,7 +449,7 @@ void StaticRenderingSystem::Update(int activeScene, float deltaTime)
 				pos->y + (s->height / 2.0f) > Game::main.bottomY && pos->y - (s->height / 2.0f) < Game::main.topY &&
 				pos->z < Game::main.camZ)
 			{
-				Game::main.renderer->prepareQuad(pos, s->width, s->height, s->scaleX, s->scaleY, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), s->sprite->ID, s->flippedX, s->flippedY);
+				Game::main.renderer->prepareQuad(pos, s->width, s->height, s->scaleX, s->scaleY, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), s->sprite->ID, s->mapTex->ID, s->tiled, s->flippedX, s->flippedY);
 			}
 		}
 	}
@@ -667,7 +671,7 @@ void AnimationSystem::Update(int activeScene, float deltaTime)
 				pos->z < Game::main.camZ)
 			{
 				// std::cout << std::to_string(activeAnimation->width) + "/" + std::to_string(activeAnimation->height) + "\n";
-				Game::main.renderer->prepareQuad(pos, activeAnimation->width, activeAnimation->height, a->scaleX, a->scaleY, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), activeAnimation->ID, cellX, cellY, activeAnimation->columns, activeAnimation->rows, a->flippedX, a->flippedY);
+				Game::main.renderer->prepareQuad(pos, activeAnimation->width, activeAnimation->height, a->scaleX, a->scaleY, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), activeAnimation->ID, a->mapTex->ID, cellX, cellY, activeAnimation->columns, activeAnimation->rows, a->flippedX, a->flippedY);
 			}
 
 		}

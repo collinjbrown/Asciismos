@@ -132,11 +132,12 @@ public:
 	// to make subtle (or sometimes unsubtle) changes to the appearance of the sprite without having to create multiple sprites for 
 	// every possible variation we desire.
 	Texture2D* sprite;
+	Texture2D* mapTex;
 
 	// Again, a quick and dirty reference to the position component allows us to reference it directly instead of going through the entity's component map.
 	PositionComponent* pos;
 
-	StaticSpriteComponent(Entity* entity, bool active, PositionComponent* pos, float width, float height, float scaleX, float scaleY, Texture2D* sprite, bool flippedX, bool flippedY, bool tiled);
+	StaticSpriteComponent(Entity* entity, bool active, PositionComponent* pos, float width, float height, float scaleX, float scaleY, Texture2D* sprite, Texture2D* mapTex, bool flippedX, bool flippedY, bool tiled);
 };
 
 class InputComponent : public Component
@@ -163,6 +164,7 @@ public:
 
 	std::string activeAnimation;
 	map<std::string, Animation2D*> animations;
+	Texture2D* mapTex;
 
 	PositionComponent* pos;
 
@@ -178,7 +180,7 @@ public:
 
 	void AddAnimation(std::string s, Animation2D* anim);
 
-	AnimationComponent(Entity* entity, bool active, PositionComponent* pos, Animation2D* idleAnimation, std::string animationName, float scaleX, float scaleY, bool flippedX, bool flippedY);
+	AnimationComponent(Entity* entity, bool active, PositionComponent* pos, Animation2D* idleAnimation, std::string animationName, Texture2D* mapTex, float scaleX, float scaleY, bool flippedX, bool flippedY);
 };
 
 class AnimationControllerComponent : public Component

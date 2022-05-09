@@ -127,6 +127,10 @@ int main(void)
     renderer.textureIDs.push_back(watermark.ID);
     Game::main.textureMap.emplace("watermark", &watermark);
 
+    Texture2D watermarkMap{ "assets/sprites/watermark/watermark_map.png", true, GL_NEAREST };
+    renderer.textureIDs.push_back(watermarkMap.ID);
+    Game::main.textureMap.emplace("watermarkMap", &watermarkMap);
+
     Game::main.renderer = &renderer;
     #pragma endregion
 
